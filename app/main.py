@@ -25,6 +25,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import HTMLResponse
 import os
 
 from app.config import CORS_ORIGINS, GATEWAY_API_KEY, API_KEY_HEADER_NAME
@@ -74,11 +75,19 @@ async def gateway_auth(request: Request, call_next):
     default (GATEWAY_API_KEY unset) for local dev/demo; set
     EMART_AI_GATEWAY_KEY in production and have E-Mart's backend send it
     on every call."""
-    if GATEWAY_API_KEY and request.url.path not in ("/docs", "/openapi.json", "/redoc", "/health"):
+    if GATEWAY_API_KEY and request.url.path not in ("/", "/docs", "/openapi.json", "/redoc", "/health"):
         provided = request.headers.get(API_KEY_HEADER_NAME)
         if provided != GATEWAY_API_KEY:
             raise HTTPException(status_code=401, detail="Missing or invalid AI gateway key")
     return await call_next(request)
+
+
+@app.get("/", response_class=HTMLResponse, tags=["Dashboard UI"])
+def get_dashboard():
+    template_path = os.path.join(os.path.dirname(__file__), "templates", "index.html")
+    with open(template_path, "r", encoding="utf-8") as f:
+        html_content = f.read()
+    return HTMLResponse(content=html_content)
 
 
 @app.get("/health", tags=["System"])

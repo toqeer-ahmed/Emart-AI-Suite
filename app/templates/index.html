@@ -1,0 +1,1434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Mart AI Suite - Developer Control Panel</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-base: #0B0F19;
+            --bg-surface: #111827;
+            --bg-card: #1F2937;
+            --border-color: rgba(255, 255, 255, 0.08);
+            
+            --color-primary: #3B82F6;     /* Neon Blue */
+            --color-success: #10B981;     /* Emerald Green */
+            --color-warning: #F59E0B;     /* Amber Orange */
+            --color-danger: #EF4444;      /* Red */
+            --color-purple: #8B5CF6;      /* Violet */
+            --color-pink: #EC4899;        /* Hot Pink */
+            --color-text-main: #F3F4F6;
+            --color-text-muted: #9CA3AF;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-base);
+            color: var(--color-text-main);
+            min-height: 100vh;
+            display: flex;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+        }
+
+        /* --- SIDEBAR --- */
+        .sidebar {
+            width: 280px;
+            background-color: var(--bg-surface);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            padding: 24px;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 10;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 32px;
+            padding: 0 8px;
+        }
+
+        .brand i {
+            font-size: 24px;
+            color: var(--color-primary);
+            text-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+        }
+
+        .brand-name {
+            font-size: 20px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #FFF 30%, var(--color-primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            overflow-y: auto;
+            flex: 1;
+            padding-right: 4px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-radius: 10px;
+            color: var(--color-text-muted);
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .nav-item:hover {
+            color: var(--color-text-main);
+            background-color: rgba(255, 255, 255, 0.03);
+        }
+
+        .nav-item.active {
+            color: #FFF;
+            background-color: rgba(59, 130, 246, 0.15);
+            border: 1px solid rgba(59, 130, 246, 0.25);
+        }
+
+        .nav-item.active i {
+            color: var(--color-primary);
+        }
+
+        /* --- MAIN CONTENT --- */
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 40px;
+            max-width: 1200px;
+            min-height: 100vh;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 32px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .header-title h1 {
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .header-title p {
+            font-size: 14px;
+            color: var(--color-text-muted);
+            margin-top: 4px;
+        }
+
+        /* --- GLASSMOPHISM CARDS --- */
+        .glass-card {
+            background: rgba(17, 24, 39, 0.7);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 28px;
+            margin-bottom: 24px;
+        }
+
+        .card-header {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-title i {
+            color: var(--color-primary);
+        }
+
+        /* --- FORM ELEMENTS --- */
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--color-text-muted);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-control, select, textarea {
+            width: 100%;
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px 14px;
+            color: var(--color-text-main);
+            font-family: inherit;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+
+        .form-control:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 8px rgba(59, 130, 246, 0.25);
+        }
+
+        .btn {
+            background-color: var(--color-primary);
+            color: #FFF;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .btn-success {
+            background-color: var(--color-success);
+        }
+
+        .btn-purple {
+            background-color: var(--color-purple);
+        }
+
+        .btn-pink {
+            background-color: var(--color-pink);
+        }
+
+        /* --- LAYOUT GRID --- */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 24px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .badge-success { background: rgba(16, 185, 129, 0.15); color: var(--color-success); border: 1px solid rgba(16, 185, 129, 0.3); }
+        .badge-warning { background: rgba(245, 158, 11, 0.15); color: var(--color-warning); border: 1px solid rgba(245, 158, 11, 0.3); }
+        .badge-danger { background: rgba(239, 68, 68, 0.15); color: var(--color-danger); border: 1px solid rgba(239, 68, 68, 0.3); }
+        .badge-info { background: rgba(59, 130, 246, 0.15); color: var(--color-primary); border: 1px solid rgba(59, 130, 246, 0.3); }
+
+        /* --- TABS WRAPPER --- */
+        .tab-panel {
+            display: none;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+
+        /* --- RESPONSE VIEWER --- */
+        .response-viewer {
+            background-color: #0d1117;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            overflow-x: auto;
+            max-height: 400px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 13px;
+            color: #8b949e;
+        }
+
+        /* --- MOCK PRODUCT CARD --- */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 16px;
+        }
+
+        .product-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            transition: all 0.2s ease;
+        }
+
+        .product-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .product-sku {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--color-primary);
+            text-transform: uppercase;
+        }
+
+        .product-name {
+            font-size: 14px;
+            font-weight: 600;
+            margin: 6px 0;
+        }
+
+        .product-price {
+            font-size: 16px;
+            font-weight: 700;
+            color: #FFF;
+        }
+
+        .product-reason {
+            font-size: 11px;
+            color: var(--color-text-muted);
+            margin-top: 8px;
+            background-color: rgba(255, 255, 255, 0.03);
+            padding: 4px 8px;
+            border-radius: 6px;
+            border-left: 2px solid var(--color-primary);
+        }
+
+        /* --- CHAT INTERFACE --- */
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 450px;
+            background-color: #0B0F19;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .message {
+            max-width: 75%;
+            padding: 12px 16px;
+            border-radius: 16px;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .message-user {
+            background-color: var(--color-primary);
+            color: #FFF;
+            align-self: flex-end;
+            border-bottom-right-radius: 2px;
+        }
+
+        .message-assistant {
+            background-color: var(--bg-card);
+            color: var(--color-text-main);
+            align-self: flex-start;
+            border-bottom-left-radius: 2px;
+            border: 1px solid var(--border-color);
+        }
+
+        .chat-input-bar {
+            display: flex;
+            border-top: 1px solid var(--border-color);
+            padding: 10px;
+            background-color: var(--bg-surface);
+            gap: 10px;
+        }
+
+        .chat-services {
+            font-size: 11px;
+            color: var(--color-text-muted);
+            margin-top: 6px;
+            display: flex;
+            gap: 6px;
+        }
+
+        /* --- LOADER --- */
+        .loader {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* --- FORECASTING SVG CHART --- */
+        .chart-container-svg {
+            width: 100%;
+            height: 180px;
+            margin-top: 12px;
+        }
+
+        /* --- PHOTO COMPARISON --- */
+        .photo-compare {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .photo-box {
+            text-align: center;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 12px;
+            background-color: var(--bg-card);
+        }
+
+        .photo-box img {
+            max-width: 100%;
+            height: auto;
+            max-height: 220px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        .stars-select {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .stars-select i {
+            font-size: 20px;
+            color: var(--color-text-muted);
+            cursor: pointer;
+        }
+
+        .stars-select i.active {
+            color: var(--color-warning);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <nav class="sidebar">
+        <div class="brand">
+            <i class="fa-solid fa-microchip"></i>
+            <span class="brand-name">E-Mart AI Suite</span>
+        </div>
+        <ul class="nav-links">
+            <a class="nav-item active" data-tab="tab-overview"><i class="fa-solid fa-chart-line"></i>Overview</a>
+            <a class="nav-item" data-tab="tab-search"><i class="fa-solid fa-magnifying-glass"></i>Semantic Search</a>
+            <a class="nav-item" data-tab="tab-recs"><i class="fa-solid fa-tags"></i>Recommendations</a>
+            <a class="nav-item" data-tab="tab-assistant"><i class="fa-solid fa-comments"></i>Shopping Assistant</a>
+            <a class="nav-item" data-tab="tab-sentiment"><i class="fa-solid fa-face-smile"></i>Sentiment Analysis</a>
+            <a class="nav-item" data-tab="tab-forecasting"><i class="fa-solid fa-arrow-trend-up"></i>Demand Forecasting</a>
+            <a class="nav-item" data-tab="tab-fraud"><i class="fa-solid fa-shield-halved"></i>Fraud Detection</a>
+            <a class="nav-item" data-tab="tab-photo"><i class="fa-solid fa-wand-magic-sparkles"></i>Photo Studio</a>
+            <a class="nav-item" data-tab="tab-listing"><i class="fa-solid fa-file-pen"></i>Listing Generator</a>
+        </ul>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+        <!-- HEADER -->
+        <header class="header">
+            <div class="header-title">
+                <h1 id="active-title">AI Suite Overview</h1>
+                <p id="active-desc">Unified Dev Interface & Module Testbed</p>
+            </div>
+            <div>
+                <span class="badge badge-success"><i class="fa-solid fa-circle-check"></i> Gateway Online</span>
+            </div>
+        </header>
+
+        <!-- TAB: OVERVIEW -->
+        <section id="tab-overview" class="tab-panel active">
+            <div class="glass-card">
+                <h2>Welcome to the E-Mart AI Suite Panel</h2>
+                <p style="color: var(--color-text-muted); margin-top: 10px; line-height: 1.6;">
+                    This control panel interfaces directly with the self-contained FastAPI backend running on your system. Each tab contains interactive controls that submit real JSON payloads to check the response of the upgraded models.
+                </p>
+            </div>
+            
+            <div class="product-grid" style="grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));">
+                <div class="product-card" onclick="switchTab('tab-sentiment')">
+                    <div style="font-size: 24px; color: var(--color-success);"><i class="fa-solid fa-face-smile"></i></div>
+                    <h3 style="margin-top: 10px;">Sentiment Analysis</h3>
+                    <p style="color: var(--color-text-muted); font-size: 13px; margin-top: 6px;">
+                        Runs customer review aggregates using Hugging Face DistilBERT to classify polarities and extract aspects.
+                    </p>
+                    <div class="product-reason" style="border-left-color: var(--color-success)">Upgraded to HF Transformer</div>
+                </div>
+                <div class="product-card" onclick="switchTab('tab-search')">
+                    <div style="font-size: 24px; color: var(--color-primary);"><i class="fa-solid fa-magnifying-glass"></i></div>
+                    <h3 style="margin-top: 10px;">Semantic Search</h3>
+                    <p style="color: var(--color-text-muted); font-size: 13px; margin-top: 6px;">
+                        Vector cosine-similarity matching of search intent against the product catalog fields.
+                    </p>
+                    <div class="product-reason" style="border-left-color: var(--color-primary)">Baseline TF-IDF Active</div>
+                </div>
+                <div class="product-card" onclick="switchTab('tab-recs')">
+                    <div style="font-size: 24px; color: var(--color-warning);"><i class="fa-solid fa-tags"></i></div>
+                    <h3 style="margin-top: 10px;">Recommendations</h3>
+                    <p style="color: var(--color-text-muted); font-size: 13px; margin-top: 6px;">
+                        Calculates customer-specific co-purchase patterns and cart cross-sells.
+                    </p>
+                    <div class="product-reason" style="border-left-color: var(--color-warning)">Baseline Co-Purchase Active</div>
+                </div>
+                <div class="product-card" onclick="switchTab('tab-assistant')">
+                    <div style="font-size: 24px; color: var(--color-purple);"><i class="fa-solid fa-comments"></i></div>
+                    <h3 style="margin-top: 10px;">Shopping Assistant</h3>
+                    <p style="color: var(--color-text-muted); font-size: 13px; margin-top: 6px;">
+                        Orchestrates search, catalog, recommendations, and conversational responses.
+                    </p>
+                    <div class="product-reason" style="border-left-color: var(--color-purple)">Template/LLM Modes Supported</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB: SEMANTIC SEARCH -->
+        <section id="tab-search" class="tab-panel">
+            <div class="grid-2">
+                <div class="glass-card">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fa-solid fa-magnifying-glass"></i> Search Simulation</h3>
+                    </div>
+                    <div class="form-group">
+                        <label>Search Query</label>
+                        <input type="text" id="search-query" class="form-control" placeholder="e.g. noise-cancelling wireless earbuds, running shoes...">
+                    </div>
+                    <button class="btn" onclick="runSearch()"><i class="fa-solid fa-magnifying-glass"></i> Search Catalog</button>
+                </div>
+                <div class="glass-card">
+                    <div class="card-header">
+                        <h3>Results</h3>
+                        <span id="search-count" class="badge badge-info">0 Results</span>
+                    </div>
+                    <div id="search-results" class="product-grid" style="grid-template-columns: 1fr;">
+                        <p style="color: var(--color-text-muted); text-align: center; padding: 20px;">
+                            Enter a search query to view matching products.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB: RECOMMENDATIONS -->
+        <section id="tab-recs" class="tab-panel">
+            <div class="grid-2">
+                <div>
+                    <div class="glass-card">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fa-solid fa-user"></i> Customer Recommendations</h3>
+                        </div>
+                        <div class="form-group">
+                            <label>Customer ID</label>
+                            <input type="text" id="recs-customer-id" class="form-control" value="C1">
+                        </div>
+                        <button class="btn" onclick="getCustomerRecs()"><i class="fa-solid fa-wand-magic-sparkles"></i> Fetch Recommendations</button>
+                    </div>
+
+                    <div class="glass-card">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fa-solid fa-cart-shopping"></i> Cart Cross-Sell</h3>
+                        </div>
+                        <div class="form-group">
+                            <label>Select Items in Cart</label>
+                            <div style="display: flex; flex-direction: column; gap: 8px;" id="cart-selection-list">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </div>
+                        <button class="btn btn-success" onclick="getCartCrossSell()"><i class="fa-solid fa-rotate"></i> Get Cross-Sells</button>
+                    </div>
+                </div>
+
+                <div class="glass-card">
+                    <div class="card-header">
+                        <h3>Recommendations Output</h3>
+                    </div>
+                    <div id="recs-output" class="product-grid" style="grid-template-columns: 1fr;">
+                        <p style="color: var(--color-text-muted); text-align: center; padding: 20px;">
+                            Click fetch or get cross-sells to see suggestions.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB: ASSISTANT -->
+        <section id="tab-assistant" class="tab-panel">
+            <div class="grid-2">
+                <div class="glass-card">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fa-solid fa-comments"></i> Shopping Assistant Chat</h3>
+                    </div>
+                    <div class="chat-container">
+                        <div class="chat-messages" id="chat-box">
+                            <div class="message message-assistant">
+                                Hello! I'm your E-Mart Shopping Assistant. How can I help you discover products today?
+                            </div>
+                        </div>
+                        <div class="chat-input-bar">
+                            <input type="text" id="chat-input" class="form-control" placeholder="Type a message (e.g. 'find running shoes')...">
+                            <button class="btn btn-purple" onclick="sendChatMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <div class="glass-card">
+                        <div class="card-header">
+                            <h3>Product Recommendations Mentioned</h3>
+                        </div>
+                        <div id="chat-suggested-products" class="product-grid" style="grid-template-columns: 1fr;">
+                            <p style="color: var(--color-text-muted); text-align: center; padding: 20px;">
+                                Recommended products will appear here.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="glass-card">
+                        <div class="card-header">
+                            <h3>Last Turn JSON Details</h3>
+                        </div>
+                        <pre id="chat-json" class="response-viewer">Waiting for message...</pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB: SENTIMENT -->
+        <section id="tab-sentiment" class="tab-panel">
+            <div class="grid-2">
+                <div>
+                    <div class="glass-card">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fa-solid fa-face-smile"></i> Product Sentiment Stats</h3>
+                        </div>
+                        <div class="form-group">
+                            <label>Product (SKU)</label>
+                            <select id="sentiment-sku" onchange="loadProductSentiment()">
+                                <!-- Dynamically populated -->
+                            </select>
+                        </div>
+                        <button class="btn" onclick="loadProductSentiment()"><i class="fa-solid fa-rotate"></i> Load Stats</button>
+                        
+                        <div id="sentiment-summary-details" style="margin-top: 24px; display: none;">
+                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                                <span>Overall Sentiment:</span>
+                                <span id="sentiment-overall-badge" class="badge">neutral</span>
+                            </div>
+                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                                <span>Positive Review Ratio:</span>
+                                <span id="sentiment-ratio-text" style="font-weight: 700;">0%</span>
+                            </div>
+                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                                <span>Total Reviews Sampled:</span>
+                                <span id="sentiment-sample-size" style="font-weight: 700;">0</span>
+                            </div>
+                            
+                            <h4 style="margin-top: 18px; font-size: 14px; color: var(--color-text-muted);">Aspect Sentiments:</h4>
+                            <div id="sentiment-aspect-badges" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px;">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass-card">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fa-solid fa-comment-medical"></i> Add Customer Review</h3>
+                        </div>
+                        <div class="form-group">
+                            <label>Review Text</label>
+                            <textarea id="review-text" rows="3" class="form-control" placeholder="Write review here... e.g. Build quality is solid, but delivery took too long."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Rating (1-5)</label>
+                            <div class="stars-select" id="review-stars">
+                                <i class="fa-solid fa-star active" data-rating="1"></i>
+                                <i class="fa-solid fa-star active" data-rating="2"></i>
+                                <i class="fa-solid fa-star active" data-rating="3"></i>
+                                <i class="fa-solid fa-star active" data-rating="4"></i>
+                                <i class="fa-solid fa-star active" data-rating="5"></i>
+                            </div>
+                        </div>
+                        <button class="btn btn-success" onclick="submitReview()"><i class="fa-solid fa-plus"></i> Submit Review</button>
+                    </div>
+                </div>
+
+                <div class="glass-card">
+                    <div class="card-header">
+                        <h3>Raw JSON Response</h3>
+                    </div>
+                    <pre id="sentiment-json" class="response-viewer">Select a SKU or load stats to see payload data...</pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB: DEMAND FORECASTING -->
+        <section id="tab-forecasting" class="tab-panel">
+            <div class="grid-2">
+                <div class="glass-card">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fa-solid fa-arrow-trend-up"></i> SKU Demand Forecast</h3>
+                    </div>
+                    <div class="form-group">
+                        <label>Product (SKU)</label>
+                        <select id="forecast-sku">
+                            <!-- Populated dynamically -->
+                        </select>
+                    </div>
+                    <button class="btn" onclick="runForecast()"><i class="fa-solid fa-chart-simple"></i> Run Forecast</button>
+                    
+                    <div id="reorder-alert-box" style="margin-top: 24px; padding: 16px; border-radius: 8px; display: none;">
+                        <h4 id="reorder-title" style="margin-bottom: 6px;">Inventory Alert</h4>
+                        <p id="reorder-details" style="font-size: 13px; line-height: 1.4;"></p>
+                    </div>
+                </div>
+
+                <div class="glass-card">
+                    <div class="card-header">
+                        <h3>7-Day Forecast Points</h3>
+                    </div>
+                    <div id="forecast-output" style="display: none;">
+                        <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 14px;">
+                            <thead>
+                                <tr style="border-bottom: 1px solid var(--border-color); text-align: left;">
+                                    <th style="padding: 8px 0;">Date (Period)</th>
+                                    <th style="padding: 8px 0;">Projected Demand</th>
+                                    <th style="padding: 8px 0;">Range (95% CI)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="forecast-table-body">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <pre id="forecast-json" class="response-viewer">Load SKU forecast to see details...</pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB: FRAUD DETECTION -->
+        <section id="tab-fraud" class="tab-panel">
+            <div class="grid-2">
+                <div>
+                    <div class="glass-card">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fa-solid fa-user-shield"></i> Customer Anomaly Check</h3>
+                        </div>
+                        <div class="form-group">
+                            <label>Customer ID</label>
+                            <input type="text" id="fraud-customer-id" class="form-control" value="C1">
+                        </div>
+                        <button class="btn" onclick="runFraudCheck()"><i class="fa-solid fa-magnifying-glass"></i> Check Score</button>
+                    </div>
+
+                    <div class="glass-card">
+                        <div class="card-header">
+                            <h3 class="card-title"><i class="fa-solid fa-credit-card"></i> Checkout Rules Simulator</h3>
+                        </div>
+                        <div class="form-group">
+                            <label>Customer ID</label>
+                            <input type="text" id="fraud-sim-cust-id" class="form-control" value="C99">
+                        </div>
+                        <div class="form-group">
+                            <label>Order Amount (USD)</label>
+                            <input type="number" id="fraud-sim-amount" class="form-control" value="1200.00">
+                        </div>
+                        <div class="form-group">
+                            <label>Total Item Count</label>
+                            <input type="number" id="fraud-sim-items" class="form-control" value="3">
+                        </div>
+                        <button class="btn btn-success" onclick="runFraudSimulation()"><i class="fa-solid fa-shield-halved"></i> Run Instant Check</button>
+                    </div>
+                </div>
+
+                <div class="glass-card">
+                    <div class="card-header">
+                        <h3>Verdict / Output</h3>
+                    </div>
+                    <div id="fraud-output" style="display: none; margin-bottom: 20px; padding: 16px; border-radius: 8px; background-color: var(--bg-card); border: 1px solid var(--border-color);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                            <span>Risk Tier:</span>
+                            <span id="fraud-risk-badge" class="badge">low</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                            <span>Decision Action:</span>
+                            <span id="fraud-decision-badge" class="badge">auto_approve</span>
+                        </div>
+                        <div id="fraud-factors-container" style="margin-top: 14px;">
+                            <h4 style="font-size: 13px; color: var(--color-text-muted); margin-bottom: 6px;">Contributing Factors:</h4>
+                            <ul id="fraud-factors-list" style="margin-left: 18px; font-size: 13px; line-height: 1.4;">
+                            </ul>
+                        </div>
+                    </div>
+                    <pre id="fraud-json" class="response-viewer">Analyze customer or run simulation to see output payload...</pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB: PHOTO STUDIO -->
+        <section id="tab-photo" class="tab-panel">
+            <div class="grid-2">
+                <div class="glass-card">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fa-solid fa-wand-magic-sparkles"></i> Image Enhancer Presets</h3>
+                    </div>
+                    <div class="form-group">
+                        <label>Product (SKU)</label>
+                        <select id="photo-sku">
+                            <!-- Populated dynamically -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Image Source Path / URL</label>
+                        <input type="text" id="photo-url" class="form-control" value="/static/photo-studio/demo_product.jpg">
+                    </div>
+                    <div class="form-group">
+                        <label>Enhancement Style Preset</label>
+                        <select id="photo-style">
+                            <option value="studio_white">Studio White (Auto-Contrast + Sharp + White Canvas)</option>
+                            <option value="lifestyle">Lifestyle (Warm + Bright)</option>
+                            <option value="tabletop">Tabletop (High Contrast + Unsharp Mask)</option>
+                            <option value="minimal">Minimal (Bright + Low Saturation)</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-pink" onclick="enhancePhoto()"><i class="fa-solid fa-sparkles"></i> Process & Pad Image</button>
+                </div>
+
+                <div class="glass-card">
+                    <div class="card-header">
+                        <h3>Image Comparison Preview</h3>
+                    </div>
+                    <div id="photo-compare-view" class="photo-compare" style="display: none;">
+                        <div class="photo-box">
+                            <div class="badge badge-info">Original Source</div>
+                            <img id="photo-img-original" src="" alt="Original">
+                        </div>
+                        <div class="photo-box">
+                            <div class="badge badge-success">Processed Canvas</div>
+                            <img id="photo-img-enhanced" src="" alt="Enhanced">
+                        </div>
+                    </div>
+                    <pre id="photo-json" class="response-viewer" style="margin-top: 16px;">Trigger enhancement to view payload...</pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB: LISTING GENERATOR -->
+        <section id="tab-listing" class="tab-panel">
+            <div class="grid-2">
+                <div class="glass-card">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fa-solid fa-file-pen"></i> Marketplace Copywriter</h3>
+                    </div>
+                    <div class="form-group">
+                        <label>Target Product (SKU)</label>
+                        <select id="listing-sku">
+                            <!-- Populated dynamically -->
+                        </select>
+                    </div>
+                    <button class="btn btn-success" onclick="generateListing()"><i class="fa-solid fa-pen-nib"></i> Generate Content Draft</button>
+                </div>
+
+                <div class="glass-card">
+                    <div class="card-header">
+                        <h3>Generated Copy Output</h3>
+                    </div>
+                    <div id="listing-output" style="display: none; padding: 16px; border-radius: 8px; background-color: var(--bg-card); border: 1px solid var(--border-color); margin-bottom: 16px;">
+                        <h4 id="listing-title" style="font-size: 16px; margin-bottom: 12px; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; color: #FFF;"></h4>
+                        
+                        <h5 style="font-size: 13px; color: var(--color-primary); margin-bottom: 6px;">Key Bullet Features:</h5>
+                        <ul id="listing-bullets" style="margin-left: 18px; font-size: 13px; line-height: 1.5; margin-bottom: 14px;"></ul>
+                        
+                        <h5 style="font-size: 13px; color: var(--color-primary); margin-bottom: 6px;">Detailed Description:</h5>
+                        <p id="listing-desc" style="font-size: 13px; line-height: 1.5; margin-bottom: 14px; color: var(--color-text-muted);"></p>
+                        
+                        <h5 style="font-size: 13px; color: var(--color-primary); margin-bottom: 6px;">SEO Keywords:</h5>
+                        <div id="listing-keywords" style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px;"></div>
+                    </div>
+                    <pre id="listing-json" class="response-viewer">Select a SKU and compile description draft...</pre>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- UI Logic Script -->
+    <script>
+        // Global variables for demo products seeded
+        const products = [
+            {sku: "EM-1001", name: "Wireless Bluetooth Earbuds", price: 24.99},
+            {sku: "EM-1002", name: "Stainless Steel Water Bottle", price: 12.50},
+            {sku: "EM-1003", name: "Men's Running Shoes", price: 39.99},
+            {sku: "EM-1004", name: "Kids Educational Tablet", price: 59.00},
+            {sku: "EM-1005", name: "Non-Stick Cookware Set", price: 44.99},
+            {sku: "EM-1006", name: "Women's Denim Jacket", price: 29.99},
+            {sku: "EM-1007", name: "Smart LED Desk Lamp", price: 18.75},
+            {sku: "EM-1008", name: "Fitness Resistance Bands Set", price: 15.99}
+        ];
+
+        // Populate dropdown selectors on startup
+        document.addEventListener("DOMContentLoaded", () => {
+            const dropdowns = ["sentiment-sku", "forecast-sku", "photo-sku", "listing-sku"];
+            dropdowns.forEach(id => {
+                const select = document.getElementById(id);
+                if (select) {
+                    select.innerHTML = products.map(p => `<option value="${p.sku}">${p.name} (${p.sku})</option>`).join('');
+                }
+            });
+
+            // Populate cart checkboxes in Recs tab
+            const cartList = document.getElementById("cart-selection-list");
+            if (cartList) {
+                cartList.innerHTML = products.map(p => `
+                    <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; cursor: pointer;">
+                        <input type="checkbox" name="cart-sku-checkbox" value="${p.sku}"> ${p.name} ($${p.price})
+                    </label>
+                `).join('');
+            }
+
+            // Bind rating click handler
+            const stars = document.querySelectorAll("#review-stars i");
+            stars.forEach(star => {
+                star.addEventListener("click", (e) => {
+                    const rating = parseInt(e.target.getAttribute("data-rating"));
+                    stars.forEach(s => {
+                        const r = parseInt(s.getAttribute("data-rating"));
+                        if (r <= rating) {
+                            s.classList.add("active");
+                        } else {
+                            s.classList.remove("active");
+                        }
+                    });
+                });
+            });
+        });
+
+        // Tabs Routing Logic
+        const tabs = document.querySelectorAll(".nav-item");
+        const panels = document.querySelectorAll(".tab-panel");
+        const activeTitle = document.getElementById("active-title");
+        const activeDesc = document.getElementById("active-desc");
+
+        tabs.forEach(tab => {
+            tab.addEventListener("click", () => {
+                const targetPanel = tab.getAttribute("data-tab");
+                switchTab(targetPanel);
+            });
+        });
+
+        function switchTab(panelId) {
+            tabs.forEach(t => {
+                if (t.getAttribute("data-tab") === panelId) {
+                    t.classList.add("active");
+                } else {
+                    t.classList.remove("active");
+                }
+            });
+
+            panels.forEach(p => {
+                if (p.id === panelId) {
+                    p.classList.add("active");
+                } else {
+                    p.classList.remove("active");
+                }
+            });
+
+            // Update title
+            const item = document.querySelector(`[data-tab="${panelId}"]`);
+            if (item) {
+                activeTitle.innerText = item.innerText.trim();
+                activeDesc.innerText = `Testing the E-Mart AI ${item.innerText.trim()} Module`;
+            }
+        }
+
+        // Load Indicator helper
+        function showLoading(elementId) {
+            const pre = document.getElementById(elementId);
+            pre.innerHTML = '<span class="loader"></span> Loading response payload from gateway...';
+        }
+
+        // --- SERVICE API IMPLEMENTATIONS ---
+
+        // 1. Semantic Search API Call
+        async function runSearch() {
+            const query = document.getElementById("search-query").value;
+            if (!query) return;
+            const container = document.getElementById("search-results");
+            const countBadge = document.getElementById("search-count");
+            
+            container.innerHTML = '<span class="loader" style="margin: 20px auto; display: block;"></span>';
+            
+            try {
+                const resp = await fetch(`/search?q=${encodeURIComponent(query)}`);
+                const results = await resp.json();
+                countBadge.innerText = `${results.length} Results`;
+                
+                if (results.length === 0) {
+                    container.innerHTML = `<p style="color: var(--color-text-muted); text-align: center; padding: 20px;">No products match your query.</p>`;
+                    return;
+                }
+
+                container.innerHTML = results.map(r => `
+                    <div class="product-card">
+                        <div style="display: flex; justify-content: space-between;">
+                            <span class="product-sku">${r.sku}</span>
+                            <span class="badge badge-info">Match: ${(r.score * 100).toFixed(1)}%</span>
+                        </div>
+                        <h4 class="product-name">${r.name}</h4>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+                            <span class="product-price">$${r.price}</span>
+                            <span class="badge ${r.in_stock ? 'badge-success' : 'badge-danger'}">${r.in_stock ? 'In Stock' : 'Out of Stock'}</span>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (err) {
+                container.innerHTML = `<p style="color: var(--color-danger); text-align: center; padding: 20px;">Error connecting to backend: ${err.message}</p>`;
+            }
+        }
+
+        // 2. Product Recommendations API Call
+        async function getCustomerRecs() {
+            const customerId = document.getElementById("recs-customer-id").value;
+            const container = document.getElementById("recs-output");
+            container.innerHTML = '<span class="loader" style="margin: 20px auto; display: block;"></span>';
+            
+            try {
+                const resp = await fetch(`/recommendations/for-customer/${encodeURIComponent(customerId)}`);
+                const results = await resp.json();
+                
+                if (results.length === 0) {
+                    container.innerHTML = `<p style="color: var(--color-text-muted); text-align: center; padding: 20px;">No recommendations found for this user.</p>`;
+                    return;
+                }
+
+                container.innerHTML = results.map(r => `
+                    <div class="product-card">
+                        <span class="product-sku">${r.sku}</span>
+                        <h4 class="product-name">${r.name}</h4>
+                        <span class="product-price">$${r.price}</span>
+                        <div class="product-reason">${r.reason}</div>
+                    </div>
+                `).join('');
+            } catch (err) {
+                container.innerHTML = `<p style="color: var(--color-danger); text-align: center; padding: 20px;">Error connecting to recommendations engine.</p>`;
+            }
+        }
+
+        // Cart context recommendations
+        async function getCartCrossSell() {
+            const checkboxes = document.querySelectorAll('input[name="cart-sku-checkbox"]:checked');
+            const cartSkus = Array.from(checkboxes).map(c => c.value);
+            if (cartSkus.length === 0) {
+                alert("Please check at least one product from the cart selection list.");
+                return;
+            }
+            
+            const container = document.getElementById("recs-output");
+            container.innerHTML = '<span class="loader" style="margin: 20px auto; display: block;"></span>';
+            
+            try {
+                const resp = await fetch(`/recommendations/cart-cross-sell`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ cart_skus: cartSkus })
+                });
+                const results = await resp.json();
+                
+                container.innerHTML = results.map(r => `
+                    <div class="product-card">
+                        <span class="product-sku">${r.sku}</span>
+                        <h4 class="product-name">${r.name}</h4>
+                        <span class="product-price">$${r.price}</span>
+                        <div class="product-reason">${r.reason}</div>
+                    </div>
+                `).join('');
+            } catch (err) {
+                container.innerHTML = `<p style="color: var(--color-danger); text-align: center; padding: 20px;">Error fetching cart cross-sells.</p>`;
+            }
+        }
+
+        // 3. Shopping Assistant Chat API Call
+        async function sendChatMessage() {
+            const input = document.getElementById("chat-input");
+            const text = input.value.trim();
+            if (!text) return;
+            
+            input.value = "";
+            const chatBox = document.getElementById("chat-box");
+            
+            // Append User Message
+            chatBox.innerHTML += `
+                <div class="message message-user">${text}</div>
+            `;
+            chatBox.scrollTop = chatBox.scrollHeight;
+            
+            // Loading bubble
+            const loaderId = "loader-" + Date.now();
+            chatBox.innerHTML += `
+                <div class="message message-assistant" id="${loaderId}">
+                    <span class="loader"></span> Thinking...
+                </div>
+            `;
+            chatBox.scrollTop = chatBox.scrollHeight;
+            
+            try {
+                const resp = await fetch(`/assistant/chat`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ customer_id: "C1", message: text })
+                });
+                const result = await resp.json();
+                
+                // Replace loader bubble with assistant response
+                document.getElementById(loaderId).remove();
+                
+                let usedBadges = result.used_services.map(s => `<span class="badge badge-info">${s}</span>`).join(' ');
+                chatBox.innerHTML += `
+                    <div class="message message-assistant">
+                        ${result.reply}
+                        <div class="chat-services">
+                            Engine logs hit: ${usedBadges}
+                        </div>
+                    </div>
+                `;
+                chatBox.scrollTop = chatBox.scrollHeight;
+                
+                // Show suggested products card on side
+                const itemsContainer = document.getElementById("chat-suggested-products");
+                if (result.suggested_products && result.suggested_products.length > 0) {
+                    itemsContainer.innerHTML = result.suggested_products.map(r => `
+                        <div class="product-card">
+                            <span class="product-sku">${r.sku}</span>
+                            <h4 class="product-name">${r.name}</h4>
+                            <span class="product-price">$${r.price}</span>
+                            <div class="product-reason">${r.reason}</div>
+                        </div>
+                    `).join('');
+                } else {
+                    itemsContainer.innerHTML = `<p style="color: var(--color-text-muted); text-align: center; padding: 20px;">No exact recommendations generated.</p>`;
+                }
+                
+                document.getElementById("chat-json").innerText = JSON.stringify(result, null, 2);
+            } catch (err) {
+                document.getElementById(loaderId).remove();
+                chatBox.innerHTML += `
+                    <div class="message message-assistant" style="background-color: rgba(239, 68, 68, 0.1); border-color: var(--color-danger);">
+                        Failed to connect to the Assistant Orchestrator. Is the backend offline?
+                    </div>
+                `;
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }
+        }
+
+        // 4. Sentiment Analysis API Call
+        async function loadProductSentiment() {
+            const sku = document.getElementById("sentiment-sku").value;
+            showLoading("sentiment-json");
+            
+            try {
+                const resp = await fetch(`/sentiment/product/${encodeURIComponent(sku)}`);
+                const data = await resp.json();
+                
+                document.getElementById("sentiment-json").innerText = JSON.stringify(data, null, 2);
+                
+                // Update stats card UI
+                document.getElementById("sentiment-summary-details").style.display = "block";
+                
+                const overallBadge = document.getElementById("sentiment-overall-badge");
+                overallBadge.innerText = data.overall_sentiment;
+                
+                // Set badge colors
+                overallBadge.className = "badge";
+                if (data.overall_sentiment === "positive") overallBadge.classList.add("badge-success");
+                else if (data.overall_sentiment === "negative") overallBadge.classList.add("badge-danger");
+                else overallBadge.classList.add("badge-warning");
+                
+                document.getElementById("sentiment-ratio-text").innerText = `${(data.positive_ratio * 100).toFixed(0)}%`;
+                document.getElementById("sentiment-sample-size").innerText = data.sample_size;
+                
+                // Fill aspect list
+                const aspectContainer = document.getElementById("sentiment-aspect-badges");
+                aspectContainer.innerHTML = Object.entries(data.aspects).map(([aspect, score]) => {
+                    let c = "badge-info";
+                    if (score === "positive") c = "badge-success";
+                    else if (score === "negative") c = "badge-danger";
+                    else c = "badge-warning";
+                    return `<span class="badge ${c}">${aspect}: ${score}</span>`;
+                }).join('') || '<span style="color: var(--color-text-muted); font-size: 13px;">No aspect data available.</span>';
+                
+            } catch (err) {
+                document.getElementById("sentiment-json").innerText = `Error: ${err.message}`;
+            }
+        }
+
+        async function submitReview() {
+            const sku = document.getElementById("sentiment-sku").value;
+            const text = document.getElementById("review-text").value.trim();
+            if (!text) {
+                alert("Please write review text first.");
+                return;
+            }
+            
+            // Find active star rating count
+            const stars = document.querySelectorAll("#review-stars i.active");
+            const rating = stars.length;
+            
+            try {
+                const resp = await fetch(`/sentiment/reviews`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ sku: sku, text: text, rating: rating })
+                });
+                const result = await resp.json();
+                
+                // Reset text
+                document.getElementById("review-text").value = "";
+                alert("Review submitted successfully! Refreshing product sentiment scores...");
+                loadProductSentiment();
+            } catch (err) {
+                alert("Error submitting review: " + err.message);
+            }
+        }
+
+        // 5. Demand Forecasting API Call
+        async function runForecast() {
+            const sku = document.getElementById("forecast-sku").value;
+            showLoading("forecast-json");
+            
+            try {
+                // Fetch forecast points
+                const resp = await fetch(`/forecasting/${encodeURIComponent(sku)}`);
+                const points = await resp.json();
+                
+                // Fetch reorder alert status
+                const alertResp = await fetch(`/forecasting/${encodeURIComponent(sku)}/reorder-alert`);
+                const reorder = await alertResp.json();
+                
+                document.getElementById("forecast-json").innerText = JSON.stringify({ forecast_points: points, reorder_status: reorder }, null, 2);
+                
+                // Display Forecast Points in Table
+                document.getElementById("forecast-output").style.display = "block";
+                const tableBody = document.getElementById("forecast-table-body");
+                tableBody.innerHTML = points.map(p => `
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.04);">
+                        <td style="padding: 10px 0;">${p.period}</td>
+                        <td style="padding: 10px 0; font-weight: 700; color: #FFF;">${p.forecast_units} units</td>
+                        <td style="padding: 10px 0; color: var(--color-text-muted); font-size: 13px;">${p.lower_bound} - ${p.upper_bound}</td>
+                    </tr>
+                `).join('');
+                
+                // Display Reorder alert box
+                const alertBox = document.getElementById("reorder-alert-box");
+                alertBox.style.display = "block";
+                
+                const title = document.getElementById("reorder-title");
+                const desc = document.getElementById("reorder-details");
+                
+                if (reorder.needs_reorder) {
+                    alertBox.style.backgroundColor = "rgba(245, 158, 11, 0.12)";
+                    alertBox.style.border = "1px solid rgba(245, 158, 11, 0.3)";
+                    title.innerHTML = '<i class="fa-solid fa-triangle-exclamation" style="color: var(--color-warning);"></i> Reorder Warning!';
+                    title.style.color = "var(--color-warning)";
+                    desc.innerHTML = `Our forecasting engine predicts E-Mart will sell <strong>${reorder.projected_7day_demand} units</strong> in the next 7 days, exceeding your current inventory stock of <strong>${reorder.current_stock} units</strong>. Recommend submitting supplier reorder.`;
+                } else {
+                    alertBox.style.backgroundColor = "rgba(16, 185, 129, 0.12)";
+                    alertBox.style.border = "1px solid rgba(16, 185, 129, 0.3)";
+                    title.innerHTML = '<i class="fa-solid fa-circle-check" style="color: var(--color-success);"></i> Inventory Level Healthy';
+                    title.style.color = "var(--color-success)";
+                    desc.innerHTML = `Current stock of <strong>${reorder.current_stock} units</strong> is sufficient to meet the projected demand forecast of <strong>${reorder.projected_7day_demand} units</strong> over the next week.`;
+                }
+            } catch (err) {
+                document.getElementById("forecast-json").innerText = `Error: ${err.message}`;
+            }
+        }
+
+        // 6. Fraud Detection API Call
+        async function runFraudCheck() {
+            const customerId = document.getElementById("fraud-customer-id").value;
+            showLoading("fraud-json");
+            
+            try {
+                const resp = await fetch(`/fraud/score/${encodeURIComponent(customerId)}`);
+                const data = await resp.json();
+                
+                document.getElementById("fraud-json").innerText = JSON.stringify(data, null, 2);
+                
+                // Update Output panel
+                const output = document.getElementById("fraud-output");
+                output.style.display = "block";
+                
+                const riskBadge = document.getElementById("fraud-risk-badge");
+                riskBadge.innerText = data.risk_tier;
+                riskBadge.className = "badge";
+                if (data.risk_tier === "low") riskBadge.classList.add("badge-success");
+                else if (data.risk_tier === "high") riskBadge.classList.add("badge-danger");
+                else riskBadge.classList.add("badge-warning");
+                
+                const decBadge = document.getElementById("fraud-decision-badge");
+                decBadge.innerText = data.decision;
+                decBadge.className = "badge";
+                if (data.decision === "auto_approve") decBadge.classList.add("badge-success");
+                else if (data.decision === "hold_for_review") decBadge.classList.add("badge-danger");
+                else decBadge.classList.add("badge-warning");
+                
+                const factorsList = document.getElementById("fraud-factors-list");
+                factorsList.innerHTML = data.contributing_factors.map(f => `<li>${f}</li>`).join('') || '<li>No risky behavioral anomalies flags triggered</li>';
+                
+            } catch (err) {
+                document.getElementById("fraud-json").innerText = `Error: ${err.message}`;
+            }
+        }
+
+        async function runFraudSimulation() {
+            const custId = document.getElementById("fraud-sim-cust-id").value;
+            const amount = parseFloat(document.getElementById("fraud-sim-amount").value);
+            const items = parseInt(document.getElementById("fraud-sim-items").value);
+            showLoading("fraud-json");
+            
+            try {
+                const resp = await fetch(`/fraud/quick-check`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ customer_id: custId, cart_total: amount, item_count: items })
+                });
+                const result = await resp.json();
+                
+                document.getElementById("fraud-json").innerText = JSON.stringify(result, null, 2);
+                
+                const output = document.getElementById("fraud-output");
+                output.style.display = "block";
+                
+                const riskBadge = document.getElementById("fraud-risk-badge");
+                riskBadge.innerText = result.risk;
+                riskBadge.className = "badge";
+                if (result.risk === "low") riskBadge.classList.add("badge-success");
+                else if (result.risk === "high") riskBadge.classList.add("badge-danger");
+                else riskBadge.classList.add("badge-warning");
+                
+                const decBadge = document.getElementById("fraud-decision-badge");
+                decBadge.innerText = result.risk === "high" ? "hold_for_review" : (result.risk === "medium" ? "step_up_verification" : "auto_approve");
+                decBadge.className = "badge";
+                if (decBadge.innerText === "auto_approve") decBadge.classList.add("badge-success");
+                else if (decBadge.innerText === "hold_for_review") decBadge.classList.add("badge-danger");
+                else decBadge.classList.add("badge-warning");
+                
+                const factorsList = document.getElementById("fraud-factors-list");
+                factorsList.innerHTML = result.flags.map(f => `<li>Rule flagged: ${f}</li>`).join('') || '<li>No transactional risk flags triggered</li>';
+                
+            } catch (err) {
+                document.getElementById("fraud-json").innerText = `Error: ${err.message}`;
+            }
+        }
+
+        // 7. Photo Studio API Call
+        async function enhancePhoto() {
+            const sku = document.getElementById("photo-sku").value;
+            const style = document.getElementById("photo-style").value;
+            const imgUrl = document.getElementById("photo-url").value;
+            showLoading("photo-json");
+            
+            try {
+                const resp = await fetch(`/photo-studio/enhance`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ sku: sku, image_url: imgUrl, style: style })
+                });
+                const result = await resp.json();
+                document.getElementById("photo-json").innerText = JSON.stringify(result, null, 2);
+                
+                if (result.status === "completed") {
+                    document.getElementById("photo-compare-view").style.display = "grid";
+                    document.getElementById("photo-img-original").src = result.original_url;
+                    // Add timestamp query parameter to bust image caching in browser
+                    document.getElementById("photo-img-enhanced").src = `${result.enhanced_url}?t=${Date.now()}`;
+                } else {
+                    alert("Enhancement failed: " + result.status);
+                }
+            } catch (err) {
+                document.getElementById("photo-json").innerText = `Error: ${err.message}`;
+            }
+        }
+
+        // 8. Listing Generator API Call
+        async function generateListing() {
+            const sku = document.getElementById("listing-sku").value;
+            showLoading("listing-json");
+            
+            try {
+                const resp = await fetch(`/listing-generator/${encodeURIComponent(sku)}`);
+                const data = await resp.json();
+                
+                document.getElementById("listing-json").innerText = JSON.stringify(data, null, 2);
+                
+                document.getElementById("listing-output").style.display = "block";
+                document.getElementById("listing-title").innerText = data.title;
+                
+                const bulletContainer = document.getElementById("listing-bullets");
+                bulletContainer.innerHTML = data.bullet_points.map(b => `<li>${b}</li>`).join('');
+                
+                document.getElementById("listing-desc").innerText = data.description;
+                
+                const tagsContainer = document.getElementById("listing-keywords");
+                tagsContainer.innerHTML = data.seo_keywords.map(k => `<span class="badge badge-info">${k}</span>`).join(' ');
+                
+            } catch (err) {
+                document.getElementById("listing-json").innerText = `Error: ${err.message}`;
+            }
+        }
+    </script>
+</body>
+</html>
