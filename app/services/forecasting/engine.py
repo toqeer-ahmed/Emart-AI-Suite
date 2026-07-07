@@ -1,30 +1,23 @@
 """
 Demand Forecasting Engine
 ==========================
-Uses a simple linear-trend + seasonal-naive blend over daily unit sales
-logged in order_events. This needs no heavy dependency (Prophet pulls in
-cmdstanpy/pystan and is a fairly large install), so the add-on stays
-lightweight by default.
-
-UPGRADE PATH: once you have a few months of real E-Mart sales history,
-swap `forecast()`'s body for actual Prophet:
-
-    from prophet import Prophet
-    m = Prophet()
-    m.fit(daily_df)  # requires columns 'ds' and 'y'
-    future = m.make_future_dataframe(periods=periods)
-    forecast_df = m.predict(future)
-
-Keep the return shape (List[ForecastPoint]) identical and nothing else
-needs to change.
+Uses Meta's Prophet model to generate 7-day demand forecasts from daily unit sales
+logged in order_events. When the order history contains fewer than 5 data points,
+it falls back to a naive forecast to ensure cold-start safety.
 """
 from __future__ import annotations
 from collections import defaultdict
 from datetime import datetime, timedelta
+import logging
 from typing import List
+import pandas as pd
+from prophet import Prophet
 
 from app.shared.data_layer import get_data_layer
 from app.shared.schemas import ForecastPoint
+
+# Suppress cmdstanpy verbose logs
+logging.getLogger('cmdstanpy').setLevel(logging.WARNING)
 
 
 class ForecastingEngine:
@@ -33,15 +26,8 @@ class ForecastingEngine:
 
     def _daily_units(self, sku: str) -> dict:
         # Pull from order_events via the signals log for simplicity in the
-        # SQLite demo layer; a real adapter would query order_events
-        # directly filtered by sku.
-        all_products = self.dl.list_products()
+        # SQLite dev layer
         daily = defaultdict(int)
-        # NOTE: in this reference implementation we approximate using
-        # ai_signals("order_placed") entries logged at checkout time, since
-        # SQLiteDataLayer.get_customer_events is keyed by customer, not sku.
-        # A production adapter should query order_events directly by sku
-        # and date for accurate daily aggregates.
         signals = self.dl.get_signals("order_placed", limit=5000)
         import json
         for s in signals:
@@ -54,38 +40,49 @@ class ForecastingEngine:
     def forecast(self, sku: str, periods: int = 7) -> List[ForecastPoint]:
         daily = self._daily_units(sku)
 
-        if len(daily) < 2:
-            # Not enough history yet: flat forecast using current stock
-            # velocity assumption of 1 unit/day as a safe placeholder,
-            # clearly marked as low-confidence via wide bounds.
+        # Prophet needs at least a few historical points to compute trend and seasonality.
+        # Fall back to naive forecast if history is too sparse.
+        if len(daily) < 5:
             product = self.dl.get_product(sku)
             base = 1.0
             points = []
             for i in range(periods):
                 day = (datetime.utcnow() + timedelta(days=i + 1)).strftime("%Y-%m-%d")
-                points.append(ForecastPoint(period=day, forecast_units=base, lower_bound=0, upper_bound=base * 3))
+                points.append(ForecastPoint(
+                    period=day, 
+                    forecast_units=base, 
+                    lower_bound=0.0, 
+                    upper_bound=base * 3
+                ))
             return points
 
-        values = list(daily.values())
-        n = len(values)
-        avg = sum(values) / n
-        # simple linear trend via least squares on index
-        xs = list(range(n))
-        mean_x = sum(xs) / n
-        mean_y = avg
-        num = sum((x - mean_x) * (y - mean_y) for x, y in zip(xs, values))
-        den = sum((x - mean_x) ** 2 for x in xs) or 1
-        slope = num / den
+        # Prepare DataFrame for Prophet (requires columns 'ds' and 'y')
+        df_data = [{"ds": datetime.strptime(date, "%Y-%m-%d"), "y": float(qty)} for date, qty in daily.items()]
+        df = pd.DataFrame(df_data)
+
+        # Fit Prophet model
+        # Disable yearly/daily seasonality for sparse data, keep weekly seasonality
+        m = Prophet(yearly_seasonality=False, weekly_seasonality=True, daily_seasonality=False)
+        m.fit(df)
+
+        # Predict future
+        future = m.make_future_dataframe(periods=periods, include_history=False)
+        forecast_df = m.predict(future)
 
         points = []
-        for i in range(periods):
-            day = (datetime.utcnow() + timedelta(days=i + 1)).strftime("%Y-%m-%d")
-            point_forecast = max(avg + slope * (n + i), 0)
+        for _, row in forecast_df.iterrows():
+            period_str = row["ds"].strftime("%Y-%m-%d")
+            yhat = float(row["yhat"])
+            # Bound predictions to positive values
+            forecast_units = max(round(yhat, 2), 0.0)
+            lower_bound = max(round(float(row["yhat_lower"]), 2), 0.0)
+            upper_bound = max(round(float(row["yhat_upper"]), 2), 0.0)
+            
             points.append(ForecastPoint(
-                period=day,
-                forecast_units=round(point_forecast, 2),
-                lower_bound=round(max(point_forecast * 0.6, 0), 2),
-                upper_bound=round(point_forecast * 1.4, 2),
+                period=period_str,
+                forecast_units=forecast_units,
+                lower_bound=lower_bound,
+                upper_bound=upper_bound
             ))
         return points
 
@@ -116,3 +113,4 @@ def get_forecasting_engine() -> ForecastingEngine:
     if _engine_singleton is None:
         _engine_singleton = ForecastingEngine()
     return _engine_singleton
+
