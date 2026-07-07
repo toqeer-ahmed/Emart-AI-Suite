@@ -1,0 +1,9 @@
+__pycache__/
+*.pyc
+.env
+app/shared/emart_ai.db
+app/services/photo_studio/output/*.jpg
+!app/services/photo_studio/output/.gitkeep
+.pytest_cache/
+.venv/
+venv/

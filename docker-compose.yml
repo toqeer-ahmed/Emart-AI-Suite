@@ -1,0 +1,26 @@
+version: "3.9"
+
+services:
+  emart-ai-suite:
+    build: .
+    container_name: emart-ai-suite
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    volumes:
+      - emart_ai_data:/app/app/shared
+      - emart_ai_photos:/app/app/services/photo_studio/output
+    restart: unless-stopped
+
+volumes:
+  emart_ai_data:
+  emart_ai_photos:
+
+# HOW THIS SITS NEXT TO E-MART
+# -----------------------------
+# This service does not need to be on the same docker-compose file as
+# E-Mart's Laravel/Firebase stack. Run it anywhere reachable over HTTP
+# (same VPS on a different port, a separate small droplet, etc.) and point
+# E-Mart's backend at http://<this-host>:8000 for the endpoints listed in
+# README.md's "Integration Points" section.
