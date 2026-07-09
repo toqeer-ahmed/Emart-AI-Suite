@@ -7,7 +7,6 @@ extraction (delivery, quality, price, packaging).
 """
 from __future__ import annotations
 from typing import List, Dict
-from transformers import pipeline
 
 from app.shared.data_layer import get_data_layer
 from app.shared.schemas import SentimentSummary
@@ -23,25 +22,37 @@ ASPECT_KEYWORDS = {
 
 class SentimentEngine:
     def __init__(self):
-        # Load the pre-trained Hugging Face sentiment-analysis pipeline (DistilBERT)
-        self.pipeline = pipeline("sentiment-analysis", model="distilbert-base-uncased-finetuned-sst-2-english")
+        self.pipeline = None
+        self.vader = None
+        try:
+            from transformers import pipeline
+            self.pipeline = pipeline("sentiment-analysis", model="distilbert-base-uncased-finetuned-sst-2-english")
+        except Exception:
+            from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+            self.vader = SentimentIntensityAnalyzer()
         self.dl = get_data_layer()
 
     def _score_text(self, text: str) -> float:
         if not text.strip():
             return 0.0
         try:
-            res = self.pipeline(text)[0]
-            label = res["label"].upper()
-            score = res["score"]
-            # Map label and confidence score to range [-1.0, 1.0]
-            if label == "POSITIVE":
-                return float(score)
-            elif label == "NEGATIVE":
-                return -float(score)
+            if self.pipeline is not None:
+                res = self.pipeline(text)[0]
+                label = res["label"].upper()
+                score = res["score"]
+                if label == "POSITIVE":
+                    return float(score)
+                elif label == "NEGATIVE":
+                    return -float(score)
+                return 0.0
+            
+            if self.vader is not None:
+                scores = self.vader.polarity_scores(text)
+                return float(scores["compound"])
             return 0.0
         except Exception:
             return 0.0
+
 
     def _label(self, compound: float) -> str:
         if compound >= 0.3:

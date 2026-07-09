@@ -6,5 +6,5 @@ router = APIRouter(prefix="/assistant", tags=["Shopping Assistant"])
 
 
 @router.post("/chat", response_model=AssistantReply)
-def chat(turn: AssistantTurn):
-    return get_assistant_engine().handle_turn(turn)
+async def chat(turn: AssistantTurn):
+    return await get_assistant_engine().handle_turn(turn)

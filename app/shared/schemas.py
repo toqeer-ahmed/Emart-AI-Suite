@@ -73,6 +73,9 @@ class SearchResult(BaseModel):
     price: float
     score: float
     in_stock: bool
+    description: str = ""
+    category: str = ""
+    stock: int = 0
 
 
 class RecommendationResult(BaseModel):
@@ -80,6 +83,9 @@ class RecommendationResult(BaseModel):
     name: str
     price: float
     reason: str  # e.g. "popular", "frequently bought with X", "similar to Y"
+    description: str = ""
+    category: str = ""
+    stock: int = 0
 
 
 class SentimentSummary(BaseModel):
@@ -108,7 +114,7 @@ class ListingDraft(BaseModel):
 class PhotoEnhanceRequest(BaseModel):
     sku: str
     image_url: str
-    style: str = "studio_white"  # studio_white | lifestyle | tabletop | minimal
+    style: str = "studio_white"  
 
 
 class PhotoEnhanceResult(BaseModel):

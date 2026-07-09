@@ -17,3 +17,40 @@ ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
 CORS_ORIGINS = os.environ.get("EMART_AI_CORS_ORIGINS", "*").split(",")
 API_KEY_HEADER_NAME = "X-EMart-AI-Key"
 GATEWAY_API_KEY = os.environ.get("EMART_AI_GATEWAY_KEY", "")  # empty = auth disabled (dev mode)
+
+# Photo Studio Configs
+PHOTO_MAX_UPLOAD_SIZE = 5 * 1024 * 1024  # 5MB
+PHOTO_MAX_UPLOAD_COUNT = 10
+PHOTO_SUPPORTED_FORMATS = {"image/jpeg", "image/png", "image/webp"}
+PHOTO_JPEG_QUALITY = 90
+PHOTO_PNG_COMPRESSION = 6
+PHOTO_WEBP_QUALITY = 80
+PHOTO_CANVAS_SIZE = 800
+PHOTO_BACKGROUND_COLOR = (255, 255, 255)
+PHOTO_SHARPEN_STRENGTH = 1.2
+PHOTO_DEFAULT_OUTPUT_FORMAT = "AUTO"
+PHOTO_ENABLE_EXIF_CORRECTION = True
+PHOTO_DEFAULT_ENHANCEMENT_FLAGS = {
+    "brightness": True,
+    "contrast": True,
+    "denoise": True,
+    "color": True,
+    "sharpen": True,
+    "background": True
+}
+PHOTO_OUTPUT_DIR = os.environ.get("EMART_AI_PHOTO_OUTPUT_DIR", os.path.abspath(os.path.join(os.path.dirname(__file__), "services", "photo_studio", "output")))
+
+PHOTO_QUALITY_WEIGHTS = {
+    "brightness": 0.25,
+    "contrast": 0.25,
+    "sharpness": 0.30,
+    "noise": 0.20
+}
+PHOTO_QUALITY_BRIGHTNESS_SKIP = 0.85
+PHOTO_QUALITY_CONTRAST_SKIP = 0.80
+PHOTO_QUALITY_NOISE_SKIP = 0.05
+PHOTO_QUALITY_SHARPNESS_SKIP = 0.75
+
+
+
+

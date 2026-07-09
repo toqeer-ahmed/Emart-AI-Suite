@@ -25,7 +25,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 import os
 
 from app.config import CORS_ORIGINS, GATEWAY_API_KEY, API_KEY_HEADER_NAME
@@ -35,7 +35,25 @@ from app.shared.seed_data import seed
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     seed()  # safe to run repeatedly; upserts demo catalog + reviews
+    try:
+        from app.services.assistant.engine import get_assistant_engine
+        get_assistant_engine().start_background_tasks()
+    except Exception:
+        pass
     yield
+    # Clean up the listing generator engine singleton session on shutdown
+    try:
+        from app.services.listing_generator.engine import get_listing_engine
+        get_listing_engine().close()
+    except Exception:
+        pass
+    # Clean up the shopping assistant engine singleton session on shutdown
+    try:
+        from app.services.assistant.engine import get_assistant_engine
+        get_assistant_engine().close()
+    except Exception:
+        pass
+
 
 from app.services.fraud.router import router as fraud_router
 from app.services.search.router import router as search_router
@@ -78,7 +96,7 @@ async def gateway_auth(request: Request, call_next):
     if GATEWAY_API_KEY and request.url.path not in ("/", "/docs", "/openapi.json", "/redoc", "/health"):
         provided = request.headers.get(API_KEY_HEADER_NAME)
         if provided != GATEWAY_API_KEY:
-            raise HTTPException(status_code=401, detail="Missing or invalid AI gateway key")
+            return JSONResponse(status_code=401, content={"detail": "Missing or invalid AI gateway key"})
     return await call_next(request)
 
 

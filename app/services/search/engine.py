@@ -73,10 +73,25 @@ class SearchEngine:
                 sku=product["sku"], name=product["name"],
                 price=product["price"], score=round(float(score), 4),
                 in_stock=in_stock,
+                description=product.get("description", ""),
+                category=product.get("category", ""),
+                stock=product.get("stock", 0)
             ))
             if len(results) >= top_k:
                 break
         return results
+
+    def list_categories(self) -> List[str]:
+        """Returns a sorted list of unique categories available in the catalog."""
+        if not self._products:
+            self.refresh()
+        return sorted(list(set(p.get("category") for p in self._products if p.get("category"))))
+
+    def list_products(self) -> List[dict]:
+        """Returns all products currently loaded in the search index."""
+        if not self._products:
+            self.refresh()
+        return self._products
 
 
 _engine_singleton: SearchEngine = None

@@ -30,7 +30,11 @@ class RecommendationEngine:
         # until real interaction volume builds up.
         ranked = sorted(products, key=lambda p: p.get("stock", 0), reverse=True)
         return [
-            RecommendationResult(sku=p["sku"], name=p["name"], price=p["price"], reason="popular")
+            RecommendationResult(
+                sku=p["sku"], name=p["name"], price=p["price"], reason="popular",
+                description=p.get("description", ""), category=p.get("category", ""),
+                stock=p.get("stock", 0)
+            )
             for p in ranked if p["sku"] not in exclude_skus
         ][:5]
 
@@ -81,6 +85,8 @@ class RecommendationEngine:
                 results.append(RecommendationResult(
                     sku=sku, name=product["name"], price=product["price"],
                     reason="frequently bought together with items in your history",
+                    description=product.get("description", ""), category=product.get("category", ""),
+                    stock=product.get("stock", 0)
                 ))
         if len(results) < top_k:
             filler = self._popularity_ranking(exclude_skus=bought_skus | {r.sku for r in results})
@@ -103,6 +109,8 @@ class RecommendationEngine:
                 results.append(RecommendationResult(
                     sku=sku, name=product["name"], price=product["price"],
                     reason="pairs well with items in your cart",
+                    description=product.get("description", ""), category=product.get("category", ""),
+                    stock=product.get("stock", 0)
                 ))
         if len(results) < top_k:
             filler = self._popularity_ranking(exclude_skus=set(cart_skus) | {r.sku for r in results})
