@@ -77,6 +77,9 @@ class DataLayer(ABC):
     @abstractmethod
     def get_signals(self, signal_type: str, limit: int = 1000) -> List[Dict[str, Any]]: ...
 
+    @abstractmethod
+    def get_all_order_events(self) -> List[Dict[str, Any]]: ...
+
 
 class SQLiteDataLayer(DataLayer):
     """Default, zero-config implementation. Good for local dev, demos, and
@@ -170,6 +173,11 @@ class SQLiteDataLayer(DataLayer):
         with self._conn() as c:
             rows = c.execute("SELECT * FROM ai_signals WHERE signal_type = ? ORDER BY id DESC LIMIT ?",
                               (signal_type, limit)).fetchall()
+            return [dict(r) for r in rows]
+
+    def get_all_order_events(self) -> List[Dict[str, Any]]:
+        with self._conn() as c:
+            rows = c.execute("SELECT * FROM order_events").fetchall()
             return [dict(r) for r in rows]
 
 
