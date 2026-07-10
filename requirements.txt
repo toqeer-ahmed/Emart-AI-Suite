@@ -9,6 +9,8 @@ vaderSentiment==3.3.2
 Pillow==10.4.0
 requests==2.33.1
 python-multipart==0.0.9
+opencv-python==5.0.0.93
+
 
 # --- optional, only needed if you upgrade past the lightweight defaults ---
 # prophet          # for real demand forecasting (see forecasting/engine.py)
